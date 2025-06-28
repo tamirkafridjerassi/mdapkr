@@ -1,0 +1,34 @@
+name: Enforce Allowed EC2 Instance Types
+
+on:
+  pull_request:
+    paths:
+      - '**/*.yaml'
+      - '**/*.yml'
+      - '**/*.tf'
+      - '**/*.sh'
+
+jobs:
+  validate-ec2-types:
+    name: Validate EC2 Nodegroup Types
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Scan for Unauthorized EC2 Instance Types
+      run: |
+        echo "🔍 Checking for EC2 instance types outside of allowed t3a.small/medium/large..."
+
+        # Capture disallowed types
+        BAD_TYPES=$(grep -iE 'node[-_ ]?type.*(t2\.|c5\.|m5\.|r5\.|t3[^a]|[^a-z]t3[^a])' -r . || true)
+
+        if [[ -n "$BAD_TYPES" ]]; then
+          echo "🚫 Disallowed EC2 instance types found:"
+          echo "$BAD_TYPES"
+          echo "❌ Only t3a.small, t3a.medium, and t3a.large are permitted."
+          exit 1
+        else
+          echo "✅ All EC2 instance types are valid."
+        fi
