@@ -60,6 +60,11 @@ jobs:
     needs: build-and-push
 
     steps:
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install docker-compose-plugin
+
       - name: Checkout code
         uses: actions/checkout@v4
 
