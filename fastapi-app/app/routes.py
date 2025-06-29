@@ -4,20 +4,20 @@ from app.db import people_db, mission_db
 
 router = APIRouter()
 
-# Person endpoints
-@router.get("/person")
+# People endpoints
+@router.get("/people")
 async def get_people():
     return await people_db.get_all()
 
-@router.post("/person/{id}")
+@router.post("/people/{id}")
 async def create_or_update_person(id: str, person: Person):
     return await people_db.upsert(id, person)
 
-@router.get("/person/{id}")
+@router.get("/people/{id}")
 async def get_person(id: str):
     return await people_db.get(id)
 
-@router.delete("/person/{id}")
+@router.delete("/people/{id}")
 async def delete_person(id: str):
     return await people_db.delete(id)
 
