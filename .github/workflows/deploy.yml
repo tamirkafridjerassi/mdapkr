@@ -79,12 +79,19 @@ jobs:
       - name: Start docker-compose test environment
         run: docker compose -f docker-compose.test.yml up -d
 
-      - name: Wait for API to be healthy
+      - name: Wait for FastAPI to become ready
         run: |
-          for i in {1..10}; do
-            curl -s http://localhost:8000/people && exit 0 || sleep 3
+          for i in {1..20}; do
+            echo "Checking FastAPI at http://localhost:8000/people (attempt $i)..."
+            if curl -sSf http://localhost:8000/people > /dev/null; then
+              echo "FastAPI is up!"
+              exit 0
+            fi
+            sleep 3
           done
-          echo "API did not start in time" && exit 1
+          echo "FastAPI failed to start after multiple attempts."
+          docker compose -f docker-compose.test.yml logs
+          exit 1
 
       - name: Run end-to-end tests
         run: pytest tests/e2e
